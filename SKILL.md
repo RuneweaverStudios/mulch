@@ -10,11 +10,35 @@ Structured expertise that accumulates over time, lives in git, and works with an
 
 **Benefits:** Better and more consistent coding · Improved experience · Less hallucination (grounding in project expertise)
 
-**When to use:** Command/tool fails, user corrects you, user wants a missing feature, your knowledge was wrong, or you found a better approach — record with Mulch and promote proven patterns to project memory.
+**When to use:** Command/tool fails, user corrects you, user wants a missing feature, your knowledge was wrong, or you found a better approach — record with Mulch and promote proven patterns to project memory. **Auto-detection:** The hook now detects errors and corrections automatically and prompts to record.
 
 **Mechanics:** One learning store — `.mulch/` (append-only JSONL, git-tracked, queryable). Session start: `mulch prime`. Recording: `mulch record <domain> --type <type> ...`. No `.learnings/` markdown files.
 
 **Qualification (features, benefits, pain points):** See [QUALIFICATION.md](QUALIFICATION.md). **Benchmark (token efficiency, troubleshooting skill improvement):** See [BENCHMARK.md](BENCHMARK.md) — e.g. ~54% fewer chars to get same resolutions; find rate same or better; less context → fewer tokens, less noise, lower risk of wrong fix.
+
+## New Features (v1.1)
+
+### Auto-Detection
+The hook now automatically detects learning moments:
+- **Errors/failures** — When commands fail or return errors
+- **Corrections** — When you say "no", "actually", "wrong", etc.
+- **Retries** — When you ask to try again
+
+The agent will prompt: "Want me to record this for next time?"
+
+### Pre-loaded Domains
+24 preset domains included in `config/domains.json`:
+```
+api, database, testing, frontend, backend, infra, docs, config,
+security, performance, deployment, auth, errors, debugging,
+workflow, customer, system, marketing, sales, content,
+competitors, crypto, automation, openclaw
+```
+
+### Notifications
+When a learning is recorded, you're notified via Telegram.
+
+---
 
 ## Quick Reference
 
@@ -41,6 +65,9 @@ npm install -g mulch-cli
 **Initialize in project:**
 ```bash
 mulch init
+# Quick: add all preset domains at once
+cat config/domains.json | jq -r '.domains[].name' | xargs -I {} mulch add {}
+# Or add individually:
 mulch add api
 mulch add database
 mulch add testing
