@@ -181,11 +181,14 @@ async function execute(params) {
       return queryDomain(domain || inferredDomain);
     
     case 'promote':
-      return promoteLearning(id, to);
+      if (!params.id) {
+        return { status: 'error', message: 'Missing required parameter: id' };
+      }
+      return promoteLearning(params.id, to);
     
     case 'search':
       // Alias for search()
-      return search(code);
+      return search(params.query || params.content || description);
     
     case 'notify':
       // Send notification with smart domain
