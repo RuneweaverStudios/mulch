@@ -9,16 +9,17 @@ Mulch records learnings in `.mulch/` (JSONL files). Code Mode lets you **search*
 ## Tools (Only 2!)
 
 ### search(query)
-Filters memories using JavaScript code. Returns only relevant learnings.
+Filters memories using named safe filters (no arbitrary code execution). Pass a filter name as a string, or an object with `{filter, ...params}`.
 
 ```javascript
 // Example: Find all failures related to OpenRouter
-const learnings = await search(`
-  mulch
-    .filter(r => r.type === 'failure')
-    .filter(r => r.content.toLowerCase().includes('openrouter'))
-    .map(r => ({ domain: r.domain, description: r.description, resolution: r.resolution }))
-`);
+const learnings = await search({ filter: 'byType', type: 'failure' });
+
+// Search by keyword across all domains
+const results = await search('openrouter');
+
+// Filter by domain
+const apiLearnings = await search({ filter: 'byDomain', domain: 'api' });
 ```
 
 ### execute(action)

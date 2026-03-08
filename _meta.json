@@ -1,7 +1,8 @@
 {
   "schema": "openclaw.skill.v1",
   "slug": "mulch",
-  "name": "mulch-self-improver",
+  "name": "mulch",
+  "main": "mulch.js",
   "version": "2.1.0",
   "displayName": "Mulch Self Improver",
   "description": "Token-efficient memory system using Code Mode - only 2 tools: search() and execute(). 99.9% token savings. v2.1.0 adds Smart Domain Inference.",
@@ -17,9 +18,10 @@
   "tools": [
     {
       "name": "search",
-      "description": "Filter memories using JavaScript code - only loads relevant learnings, not entire history",
+      "description": "Filter memories using named safe filters - only loads relevant learnings, not entire history",
       "params": {
-        "code": "JS filter code, e.g., 'r => r.type === \"failure\"'"
+        "filter": "Named filter: byType, byDomain, byKeyword, recent, all",
+        "keyword": "Search keyword (for byKeyword filter or plain string query)"
       }
     },
     {
