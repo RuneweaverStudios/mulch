@@ -1,10 +1,19 @@
 {
+  "schema": "openclaw.skill.v1",
   "slug": "mulch",
-  "name": "Mulch Self Improver",
-  "description": "Token-efficient memory system using Code Mode - only 2 tools: search() and execute(). 99.9% token savings. v2.1.0 adds Smart Domain Inference.",
+  "name": "mulch-self-improver",
   "version": "2.1.0",
+  "displayName": "Mulch Self Improver",
+  "description": "Token-efficient memory system using Code Mode - only 2 tools: search() and execute(). 99.9% token savings. v2.1.0 adds Smart Domain Inference.",
   "author": "RuneweaverStudios",
-  "tags": ["memory", "learning", "code-mode", "token-optimization", "smart-inference"],
+  "tags": [
+    "memory",
+    "learning",
+    "code-mode",
+    "token-optimization",
+    "smart-inference"
+  ],
+  "platform": "openclaw",
   "tools": [
     {
       "name": "search",
@@ -29,7 +38,24 @@
   ],
   "tokenSavings": "99.9% (500 tokens vs 50,000+)",
   "smartInference": {
-    "domains": ["Skills", "GitHub", "OpenClaw", "Telegram", "Sly", "Social", "Memory", "Config", "Automation", "Browser", "Dependencies", "Vision", "Weather", "Humanizer", "Mulch", "General"],
+    "domains": [
+      "Skills",
+      "GitHub",
+      "OpenClaw",
+      "Telegram",
+      "Sly",
+      "Social",
+      "Memory",
+      "Config",
+      "Automation",
+      "Browser",
+      "Dependencies",
+      "Vision",
+      "Weather",
+      "Humanizer",
+      "Mulch",
+      "General"
+    ],
     "enabled": true
   },
   "publishedAt": 1771777713337
