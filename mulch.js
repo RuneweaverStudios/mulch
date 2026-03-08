@@ -55,28 +55,79 @@ function inferDomain(content, explicitDomain, explicitPath) {
 }
 
 /**
- * search - Filter memories using JavaScript code
- * @param {string} code - JS code to filter memories
- * @returns {Promise<Array>} Filtered learnings
+ * Allowed filter operations for safe searching (no arbitrary code execution).
+ * Users select a filter by name and provide parameters instead of raw JS code.
  */
-async function search(code) {
+const SAFE_FILTERS = {
+  // Filter by domain name
+  byDomain: (learnings, params) =>
+    learnings.filter(l => l.domain === params.domain),
+
+  // Filter by type
+  byType: (learnings, params) =>
+    learnings.filter(l => l.type === params.type),
+
+  // Search description/content by substring (case-insensitive)
+  byKeyword: (learnings, params) => {
+    const kw = (params.keyword || '').toLowerCase();
+    return learnings.filter(l =>
+      (l.description || '').toLowerCase().includes(kw) ||
+      (l.content || '').toLowerCase().includes(kw) ||
+      (l.title || '').toLowerCase().includes(kw)
+    );
+  },
+
+  // Return the N most recent learnings
+  recent: (learnings, params) => {
+    const n = Math.min(params.count || 10, 50);
+    return learnings.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || '')).slice(0, n);
+  },
+
+  // Return all learnings (up to limit)
+  all: (learnings) => learnings,
+};
+
+/**
+ * search - Filter memories using a named safe filter (no arbitrary code execution).
+ * @param {string|object} query - Filter name (string) or {filter, ...params}
+ * @returns {Promise<Object>} Filtered learnings
+ */
+async function search(query) {
   try {
-    // Parse the filter code
-    const filterFn = new Function('mulch', code);
-    
+    // Normalize query: accept string (filter name) or object {filter, ...params}
+    let filterName, params;
+    if (typeof query === 'string') {
+      // Legacy compatibility: treat plain string as keyword search
+      filterName = 'byKeyword';
+      params = { keyword: query };
+    } else if (typeof query === 'object' && query !== null) {
+      filterName = query.filter || 'byKeyword';
+      params = query;
+    } else {
+      return { status: 'error', message: 'query must be a string or {filter, ...params} object' };
+    }
+
+    const filterFn = SAFE_FILTERS[filterName];
+    if (!filterFn) {
+      return {
+        status: 'error',
+        message: `Unknown filter: ${filterName}. Available: ${Object.keys(SAFE_FILTERS).join(', ')}`
+      };
+    }
+
     // Load all domain files
     const learnings = [];
-    
+
     if (!fs.existsSync(MULCH_DIR)) {
       return { status: 'no-mulch-dir', learnings: [] };
     }
-    
+
     const files = fs.readdirSync(MULCH_DIR).filter(f => f.endsWith('.jsonl'));
-    
+
     for (const file of files) {
       const domain = file.replace('.jsonl', '');
       const lines = fs.readFileSync(path.join(MULCH_DIR, file), 'utf-8').split('\n').filter(Boolean);
-      
+
       for (const line of lines) {
         try {
           const record = JSON.parse(line);
@@ -86,16 +137,16 @@ async function search(code) {
         }
       }
     }
-    
-    // Apply filter
-    const result = filterFn(learnings);
-    
+
+    // SECURITY: Apply safe predefined filter instead of arbitrary code execution
+    const result = filterFn(learnings, params);
+
     return {
       status: 'success',
       count: result.length,
       results: result.slice(0, 10) // Limit to 10 for token efficiency
     };
-    
+
   } catch (error) {
     return { status: 'error', message: error.message };
   }
