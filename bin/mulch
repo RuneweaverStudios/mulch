@@ -81,13 +81,28 @@ async function handleSearch(code) {
     }
   }
   
-  try {
-    const filterFn = new Function('learnings', `return ${code}`);
-    const result = filterFn(learnings);
-    console.log(JSON.stringify(result.slice(0, 10), null, 2));
-  } catch (e) {
-    console.error('Filter error:', e.message);
-  }
+  // Use safe named filters instead of arbitrary code execution
+  const SAFE_FILTERS = {
+    byDomain: (items, kw) => items.filter(l => l.domain === kw),
+    byType: (items, kw) => items.filter(l => l.type === kw),
+    byKeyword: (items, kw) => {
+      const k = (kw || '').toLowerCase();
+      return items.filter(l =>
+        (l.description || '').toLowerCase().includes(k) ||
+        (l.content || '').toLowerCase().includes(k)
+      );
+    },
+    recent: (items) => items.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || '')).slice(0, 10),
+    all: (items) => items,
+  };
+
+  // Parse filter:keyword or just keyword
+  const parts = code.split(':');
+  const filterName = parts.length > 1 ? parts[0] : 'byKeyword';
+  const keyword = parts.length > 1 ? parts.slice(1).join(':') : code;
+  const filterFn = SAFE_FILTERS[filterName] || SAFE_FILTERS.byKeyword;
+  const result = filterFn(learnings, keyword);
+  console.log(JSON.stringify(result.slice(0, 10), null, 2));
 }
 
 async function handleExecute(args) {

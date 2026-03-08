@@ -1,0 +1,8 @@
+{
+  "mulch_dir": ".mulch",
+  "max_learnings_per_domain": 500,
+  "max_result_count": 50,
+  "smart_inference_enabled": true,
+  "default_filter": "byKeyword",
+  "backup_on_prune": true
+}

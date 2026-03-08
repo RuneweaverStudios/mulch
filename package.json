@@ -1,0 +1,10 @@
+{
+  "name": "mulch",
+  "version": "2.1.0",
+  "description": "Token-efficient memory system using Code Mode with safe named filters and smart domain inference",
+  "main": "mulch.js",
+  "bin": {
+    "mulch": "bin/mulch"
+  },
+  "license": "MIT"
+}
